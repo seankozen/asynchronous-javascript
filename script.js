@@ -47,9 +47,7 @@ const renderCountry = (data, className = '') => {
     <div class="country__data">
       <h3 class="country__name">${data.name}</h3>
       <h4 class="country__region">${data.region}</h4>
-      <p class="country__row"><span>👫</span>${(
-        +data.population / 1000000
-      ).toFixed(1)} million people</p>
+      <p class="country__row"><span>👫</span>${data.population > 1000000? (+data.population / 1000000 ).toFixed(1) + " million" : +data.population} people</p>
       <p class="country__row"><span>🗣️</span>${data.languages[0].name}</p>
       <p class="country__row"><span>💰</span>${data.currencies[0].name}</p>
     </div>
@@ -109,6 +107,35 @@ const renderCountry = (data, className = '') => {
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
+// const getRandomCountry = array => {
+//   const randomCountry = Math.floor(Math.random() * array.length);
+//   return randomCountry;
+// };
+
+// // Fetch and promises
+// const request = fetch(`https://restcountries.com/v2/name/${'japan'}`);
+// console.log(request);
+
+// const getCountryData = country => {
+//   fetch(`https://restcountries.com/v2/name/${country}`)
+//     .then(response => response.json())
+//     .then(data => {
+//       renderCountry(data[0]);
+//       if (!data[0].borders) return;
+
+//       const neighbors = data[0].borders;
+//       const country2 = neighbors[getRandomCountry(neighbors)];
+
+//       // Get neighbor country (2)
+//       return fetch(`https://restcountries.com/v2/alpha/${country2}`)
+//         .then(response => response.json())
+//         .then(data => renderCountry(data, 'neighbour'));
+//     });
+// };
+
+// //getCountryData('spain');
+// getCountryData('russia');
+
 // Fetch and promises
 const request = fetch(`https://restcountries.com/v2/name/${'japan'}`);
 console.log(request);
@@ -116,7 +143,15 @@ console.log(request);
 const getCountryData = country => {
   fetch(`https://restcountries.com/v2/name/${country}`)
     .then(response => response.json())
-    .then(data => renderCountry(data[0]));
-};
+    .then(data => {
+      renderCountry(data[0]);
+      const neighbor = data[0].borders[0];
+      if (!neighbor) return;
 
-getCountryData('japan');
+
+      // Get neighbor country (2)
+      return fetch(`https://restcountries.com/v2/alpha/${neighbor}`);
+    })
+        .then(response => response.json())
+        .then(data => renderCountry(data, 'neighbour'));
+};
