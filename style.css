@@ -74,6 +74,7 @@ body {
 
 .country__data {
   padding: 2.5rem 3.75rem 3rem 3.75rem;
+  background-color: rgb(221, 218, 218);
 }
 
 .country__name {
@@ -106,6 +107,7 @@ body {
   color: white;
   background-color: orangered;
   cursor: pointer;
+  margin-top: 10px;
 }
 
 .images {
