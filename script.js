@@ -526,7 +526,7 @@ const whereAmI = async () => {
   }
 };
 
-console.log('1: Will get location.');
+// console.log('1: Will get location.');
 //btn.addEventListener('click', whereAmI);
 // const city = whereAmI();
 // console.log(city);
@@ -547,22 +547,89 @@ console.log('1: Will get location.');
 
 // Running Promises in Parallel
 
-const get3Countries = async function (c1, c2, c3) {
-  try {
-    // const [data1] = await getJSON(`https://restcountries.com/v2/name/${c1}`);
-    // const [data2] = await getJSON(`https://restcountries.com/v2/name/${c2}`);
-    // const [data3] = await getJSON(`https://restcountries.com/v2/name/${c3}`);
+// const get3Countries = async function (c1, c2, c3) {
+//   try {
+//     // const [data1] = await getJSON(`https://restcountries.com/v2/name/${c1}`);
+//     // const [data2] = await getJSON(`https://restcountries.com/v2/name/${c2}`);
+//     // const [data3] = await getJSON(`https://restcountries.com/v2/name/${c3}`);
 
-    const data = await Promise.all([
-      getJSON(`https://restcountries.com/v2/name/${c1}`),
-      getJSON(`https://restcountries.com/v2/name/${c2}`),
-      getJSON(`https://restcountries.com/v2/name/${c3}`),
-    ]);
-    console.log(data.map(d => d[0].capital));
-    // console.log(data1.capital, data2.capital, data3.capital);
-  } catch (err) {
-    console.error(err);
-  }
+//     const data = await Promise.all([
+//       getJSON(`https://restcountries.com/v2/name/${c1}`),
+//       getJSON(`https://restcountries.com/v2/name/${c2}`),
+//       getJSON(`https://restcountries.com/v2/name/${c3}`),
+//     ]);
+//     console.log(data.map(d => d[0].capital));
+//     // console.log(data1.capital, data2.capital, data3.capital);
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };
+
+// get3Countries('japan', 'germany', 'italy');
+
+///////////////////////////////////////////////////////////
+// Promise.race (first or rejected promise is the response)
+///////////////////////////////////////////////////////////
+
+(async function () {
+  const res = await Promise.race([
+    getJSON(`https://restcountries.com/v2/name/japan`),
+    getJSON(`https://restcountries.com/v2/name/thailand`),
+    getJSON(`https://restcountries.com/v2/name/china`),
+  ]);
+  console.log(res[0]);
+})();
+
+const timeout = function (sec) {
+  return new Promise(function (_, reject) {
+    setTimeout(function () {
+      reject(new Error('Request took too long!'));
+    }, sec * 1000);
+  });
 };
 
-get3Countries('japan', 'germany', 'italy');
+Promise.race([getJSON(`https://restcountries.com/v2/name/japan`), timeout(1)])
+  .then(res => console.log(res[0]))
+  .catch(err => console.error(err));
+
+// Promise.allSettled
+
+Promise.allSettled([
+  Promise.resolve('Success'),
+  Promise.reject('ERROR'),
+  Promise.resolve('Another success'),
+]).then(res => console.log(res));
+
+
+// Promise.any [ES2021]
+// Return first fulfilled promise
+Promise.any([
+  Promise.resolve('Success'),
+  Promise.reject('ERROR'),
+  Promise.resolve('Another success'),
+])
+  .then(res => console.log(res))
+  .catch(err => console.error(err));
+
+
+// Coding Challenge #3
+// Your tasks:
+// PART 1
+// 1. Write an async function 'loadNPause' that recreates Challenge #2, this time
+// using async/await (only the part where the promise is consumed, reuse the
+// 'createImage' function from before)
+// 2. Compare the two versions, think about the big differences, and see which one
+// you like more
+// 3. Don't forget to test the error handler, and to set the network speed to “Fast 3G”
+// in the dev tools Network tab
+// PART 2
+// 1. Create an async function 'loadAll' that receives an array of image paths
+// 'imgArr'
+// 2. Use .map to loop over the array, to load all the images with the
+// 'createImage' function (call the resulting array 'imgs')
+// 3. Check out the 'imgs' array in the console! Is it like you expected?
+// 4. Use a promise combinator function to actually get the images from the array 😉
+// 5. Add the 'parallel' class to all the images (it has some CSS styles)
+// Test data Part 2: ['img/img-1.jpg', 'img/img-2.jpg', 'img/img-
+// 3.jpg']. To test, turn off the 'loadNPause' function
+// GOOD LUCK 😀
